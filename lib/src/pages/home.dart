@@ -127,7 +127,13 @@ class _HomePageState extends State<HomePage> {
     );
     return Scaffold(
         appBar: AppBar(
-          title: Text(widget.title),
+          title: Text(
+              widget.title,
+            style: TextStyle(
+              color: Colors.black,
+          ),
+          backgroundColor: Colors.white,
+          centerTitle: true,
         ),
         body: Container(
           child: Column(children: [
