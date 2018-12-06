@@ -10,21 +10,35 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  var tipPercent = 15, tipPrice = 0.00, totalPrice = 0.00;
+  var inputPrice = 0.0, tipPercent = 15.0, tipPrice = 0.0, totalPrice = 0.0;
 
   final TextEditingController price = new TextEditingController();
 
   void pressOnSubmit() {
     setState(() {
-      tipPrice = double.parse(price.text) * tipPercent * 0.01;
-      totalPrice = tipPrice + double.parse(price.text);
+      inputPrice = double.parse(price.text);
+      tipPrice = inputPrice * tipPercent * 0.01;
+      totalPrice = inputPrice + tipPrice;
+      price.text = "\$${inputPrice.toStringAsFixed(2)}";
+      FocusScope.of(context).requestFocus(new FocusNode());
+    });
+  }
+
+ void handleSlider(var position) {
+    setState(() {
+      tipPercent = position;
+      if(price.text != "") {
+        tipPrice = inputPrice * position * 0.01;
+        totalPrice = inputPrice + tipPrice;
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+
     Widget inputSection = Container(
-      margin: const EdgeInsets.fromLTRB(0, 60, 20, 0),
+      margin: const EdgeInsets.only(top: 40, right: 20),
       child: TextField(
         keyboardType: TextInputType.number,
         decoration: new InputDecoration(
@@ -48,7 +62,7 @@ class _HomePageState extends State<HomePage> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Text(
-            'Tip ($tipPercent%)',
+            'Tip (${tipPercent.round()}%)',
             style: TextStyle(
               fontSize: 20,
               color: Colors.black,
@@ -59,7 +73,7 @@ class _HomePageState extends State<HomePage> {
               minWidth: 120,
             ),
             child: Text(
-              '\$ $tipPrice',
+              '\$ ${tipPrice.toStringAsFixed(2)}',
               style: TextStyle(
                 fontSize: 20,
                 color: Colors.black,
@@ -72,7 +86,7 @@ class _HomePageState extends State<HomePage> {
     );
 
     Widget totalSection = Container(
-      margin: const EdgeInsets.fromLTRB(0, 00, 20, 0),
+      margin: const EdgeInsets.only(right: 20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -88,7 +102,7 @@ class _HomePageState extends State<HomePage> {
               minWidth: 120,
             ),
             child: Text(
-              '\$ $totalPrice',
+              '\$ ${totalPrice.toStringAsFixed(2)}',
               style: TextStyle(
                 fontSize: 20,
                 color: Colors.black,
@@ -97,6 +111,18 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ],
+      ),
+    );
+
+    Widget sliderSection = Container(
+      margin: const EdgeInsets.only(top: 30),
+      child: Slider(
+          value: tipPercent,
+          min: 0,
+          max: 100,
+          divisions: 100,
+          onChanged: handleSlider,
+          inactiveColor: Colors.black12,
       ),
     );
     return Scaffold(
@@ -108,6 +134,7 @@ class _HomePageState extends State<HomePage> {
             inputSection,
             tipSection,
             totalSection,
+            sliderSection,
           ]),
         ));
   }
