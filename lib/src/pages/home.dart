@@ -10,8 +10,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  var inputPrice = 0.0, tipPercent = 15.0, tipPrice = 0.0, totalPrice = 0.0;
 
+  var inputPrice = 0.0, tipPercent = 15.0, tipPrice = 0.0, totalPrice = 0.0;
   final TextEditingController price = new TextEditingController();
 
   void pressOnSubmit() {
@@ -125,23 +125,28 @@ class _HomePageState extends State<HomePage> {
           inactiveColor: Colors.black12,
       ),
     );
+
     return Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
           title: Text(
               widget.title,
             style: TextStyle(
               color: Colors.black,
           ),
+          ),
           backgroundColor: Colors.white,
           centerTitle: true,
         ),
         body: Container(
-          child: Column(children: [
+          child: Column(
+              children: [
             inputSection,
             tipSection,
             totalSection,
             sliderSection,
           ]),
-        ));
+        ),
+    );
   }
 }
