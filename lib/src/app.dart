@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:tip_calculator/src/pages/home.dart';
 
 class App extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -10,7 +9,7 @@ class App extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomePage(title: 'Tip Calculator'),
+      home: TipCalculator(title: 'Tip Calculator'),
     );
   }
 }

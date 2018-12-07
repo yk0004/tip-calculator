@@ -1,42 +1,89 @@
 import 'package:flutter/material.dart';
 
-class HomePage extends StatefulWidget {
-  HomePage({Key key, this.title}) : super(key: key);
+class TipCalculator extends StatefulWidget {
+  TipCalculator({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _TipCalculatorState createState() => _TipCalculatorState();
 }
 
-class _HomePageState extends State<HomePage> {
-
+class _TipCalculatorState extends State<TipCalculator> {
   var inputPrice = 0.0, tipPercent = 15.0, tipPrice = 0.0, totalPrice = 0.0;
   final TextEditingController price = new TextEditingController();
 
-  void pressOnSubmit() {
+  void _showDialog(String notice) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: new Text("Alarm"),
+          content: new Text(notice),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("Close"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _calculateTip() {
+    if (price.text == "") {
+      _showDialog("Enter price!");
+      return;
+    }
+    tipPrice = inputPrice * tipPercent / 100;
+    totalPrice = tipPrice + inputPrice;
+  }
+
+  void _onSumit() {
+    if (price.text == "") {
+      _showDialog("Enter price!");
+      return;
+    }
     setState(() {
-      inputPrice = double.parse(price.text);
-      tipPrice = inputPrice * tipPercent * 0.01;
-      totalPrice = inputPrice + tipPrice;
-      price.text = "\$${inputPrice.toStringAsFixed(2)}";
+      try {
+        inputPrice = double.parse(price.text);
+        _calculateTip();
+        price.text = "\$${inputPrice.toStringAsFixed(2)}";
+      } catch (exception) {
+        _showDialog("Please try again");
+        price.text = "";
+        inputPrice = 0.0;
+      }
       FocusScope.of(context).requestFocus(new FocusNode());
     });
   }
 
- void handleSlider(var position) {
+  void _onTap() {
+    if (price.text != "") {
+      try {
+        double.parse(price.text);
+      } catch (exception) {
+        price.text = "${inputPrice.round()}";
+      }
+    }
+  }
+
+  void _onSliderChanged(var position) {
+    if (price.text == "") {
+      _showDialog("Enter price!");
+      return;
+    }
     setState(() {
       tipPercent = position;
-      if(price.text != "") {
-        tipPrice = inputPrice * position * 0.01;
-        totalPrice = inputPrice + tipPrice;
-      }
+      _calculateTip();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-
     Widget inputSection = Container(
       margin: const EdgeInsets.only(top: 40, right: 20),
       child: TextField(
@@ -47,7 +94,8 @@ class _HomePageState extends State<HomePage> {
         ),
         textAlign: TextAlign.right,
         controller: price,
-        onEditingComplete: pressOnSubmit,
+        onEditingComplete: _onSumit,
+        onTap: _onTap,
         style: TextStyle(
           fontSize: 70,
           color: Colors.black,
@@ -117,36 +165,35 @@ class _HomePageState extends State<HomePage> {
     Widget sliderSection = Container(
       margin: const EdgeInsets.only(top: 30),
       child: Slider(
-          value: tipPercent,
-          min: 0,
-          max: 100,
-          divisions: 100,
-          onChanged: handleSlider,
-          inactiveColor: Colors.black12,
+        value: tipPercent,
+        min: 0,
+        max: 100,
+        divisions: 100,
+        onChanged: _onSliderChanged,
+        inactiveColor: Colors.black12,
       ),
     );
 
     return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Text(
+          widget.title,
+          style: TextStyle(
+            color: Colors.black,
+          ),
+        ),
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: Text(
-              widget.title,
-            style: TextStyle(
-              color: Colors.black,
-          ),
-          ),
-          backgroundColor: Colors.white,
-          centerTitle: true,
-        ),
-        body: Container(
-          child: Column(
-              children: [
-            inputSection,
-            tipSection,
-            totalSection,
-            sliderSection,
-          ]),
-        ),
+        centerTitle: true,
+      ),
+      body: Container(
+        child: Column(children: [
+          inputSection,
+          tipSection,
+          totalSection,
+          sliderSection,
+        ]),
+      ),
     );
   }
 }
