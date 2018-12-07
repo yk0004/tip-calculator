@@ -38,16 +38,12 @@ class _TipCalculatorState extends State<TipCalculator> {
     totalPrice = tipPrice + inputPrice;
   }
 
-  bool _validateInputPrice(String text) {
-    try {
-      inputPrice = double.parse(text);
-      if (inputPrice < 0) {
-        return false;
-      }
-      return true;
-    } catch (exception) {
-      return false;
+  double _validateInputPrice(String text) {
+    double value = double.parse(text);
+    if (value < 0) {
+      throw ("input price must be >= 0");
     }
+    return value;
   }
 
   void _onSumit() {
@@ -56,11 +52,16 @@ class _TipCalculatorState extends State<TipCalculator> {
       return;
     }
     setState(() {
-      if (_validateInputPrice(price.text)) {
+      try {
+        inputPrice = _validateInputPrice(price.text);
         _calcTotalPriceAndTip();
         price.text = "\$${inputPrice.toStringAsFixed(2)}";
-      } else {
-        _showDialog("Please try again");
+      } catch (exception) {
+        if (exception == "input price must be >= 0") {
+          _showDialog(exception);
+        } else {
+          _showDialog("Please enter valid number");
+        }
         price.text = "";
         inputPrice = 0.0;
       }
@@ -70,7 +71,9 @@ class _TipCalculatorState extends State<TipCalculator> {
 
   void _onTap() {
     if (price.text != "") {
-      if (!_validateInputPrice(price.text)) {
+      try {
+        inputPrice = _validateInputPrice(price.text);
+      } catch (exception) {
         price.text = "${inputPrice.round()}";
       }
     }
