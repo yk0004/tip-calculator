@@ -10,7 +10,7 @@ class TipCalculator extends StatefulWidget {
 }
 
 class _TipCalculatorState extends State<TipCalculator> {
-  var inputPrice = 0.0, tipPercent = 15.0, tipPrice = 0.0, totalPrice = 0.0;
+  var inputPrice = 0.0, rate = 15.0, tipPrice = 0.0, totalPrice = 0.0;
   final TextEditingController price = new TextEditingController();
 
   void _showDialog(String notice) {
@@ -33,13 +33,21 @@ class _TipCalculatorState extends State<TipCalculator> {
     );
   }
 
-  void _calculateTip() {
-    if (price.text == "") {
-      _showDialog("Enter price!");
-      return;
-    }
-    tipPrice = inputPrice * tipPercent / 100;
+  void _calcTotalPriceAndTip() {
+    tipPrice = inputPrice * rate / 100;
     totalPrice = tipPrice + inputPrice;
+  }
+
+  bool _validateInputPrice(String text) {
+    try {
+      inputPrice = double.parse(text);
+      if (inputPrice < 0) {
+        return false;
+      }
+      return true;
+    } catch (exception) {
+      return false;
+    }
   }
 
   void _onSumit() {
@@ -48,11 +56,10 @@ class _TipCalculatorState extends State<TipCalculator> {
       return;
     }
     setState(() {
-      try {
-        inputPrice = double.parse(price.text);
-        _calculateTip();
+      if (_validateInputPrice(price.text)) {
+        _calcTotalPriceAndTip();
         price.text = "\$${inputPrice.toStringAsFixed(2)}";
-      } catch (exception) {
+      } else {
         _showDialog("Please try again");
         price.text = "";
         inputPrice = 0.0;
@@ -63,9 +70,7 @@ class _TipCalculatorState extends State<TipCalculator> {
 
   void _onTap() {
     if (price.text != "") {
-      try {
-        double.parse(price.text);
-      } catch (exception) {
+      if (!_validateInputPrice(price.text)) {
         price.text = "${inputPrice.round()}";
       }
     }
@@ -77,8 +82,8 @@ class _TipCalculatorState extends State<TipCalculator> {
       return;
     }
     setState(() {
-      tipPercent = position;
-      _calculateTip();
+      rate = position;
+      _calcTotalPriceAndTip();
     });
   }
 
@@ -110,7 +115,7 @@ class _TipCalculatorState extends State<TipCalculator> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Text(
-            'Tip (${tipPercent.round()}%)',
+            'Tip (${rate.round()}%)',
             style: TextStyle(
               fontSize: 20,
               color: Colors.black,
@@ -165,7 +170,7 @@ class _TipCalculatorState extends State<TipCalculator> {
     Widget sliderSection = Container(
       margin: const EdgeInsets.only(top: 30),
       child: Slider(
-        value: tipPercent,
+        value: rate,
         min: 0,
         max: 100,
         divisions: 100,
